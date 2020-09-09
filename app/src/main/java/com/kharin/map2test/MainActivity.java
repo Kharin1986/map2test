@@ -3,6 +3,8 @@ package com.kharin.map2test;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.yandex.mapkit.MapKitFactory;
+import com.yandex.mapkit.mapview.MapView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -12,7 +14,7 @@ import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
     private final String APIKEY = "8b473f18-1ae9-4111-bcf6-b0e48927546b";
-
+    private MapView mapview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +28,10 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+
+          MapKitFactory.setApiKey(APIKEY);
+            MapKitFactory.initialize(this);
+
     }
 
 }
