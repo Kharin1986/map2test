@@ -1,5 +1,9 @@
 package com.kharin.map2test.ui.map;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,23 +12,34 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.kharin.map2test.R;
 import com.yandex.mapkit.Animation;
+import com.yandex.mapkit.MapKit;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.geometry.Point;
+import com.yandex.mapkit.layers.ObjectEvent;
 import com.yandex.mapkit.map.CameraPosition;
+import com.yandex.mapkit.map.CompositeIcon;
+import com.yandex.mapkit.map.IconStyle;
+import com.yandex.mapkit.map.RotationType;
 import com.yandex.mapkit.mapview.MapView;
+import com.yandex.mapkit.user_location.UserLocationLayer;
+import com.yandex.mapkit.user_location.UserLocationObjectListener;
+import com.yandex.mapkit.user_location.UserLocationView;
+import com.yandex.runtime.image.ImageProvider;
 
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements UserLocationObjectListener {
 
     private MapViewModel mapViewModel;
-
-    private final String APIKEY = "8b473f18-1ae9-4111-bcf6-b0e48927546b";
+    private UserLocationLayer userLocationLayer;
     private MapView mapview;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -32,12 +47,17 @@ public class MapFragment extends Fragment {
                 ViewModelProviders.of(this).get(MapViewModel.class);
         View root = inflater.inflate(R.layout.fragment_map, container, false);
             mapview = (MapView) root.findViewById(R.id.mapview);
-            mapview.getMap().move(
-                    new CameraPosition(new Point(55.751574, 37.573856), 11.0f, 0.0f, 0.0f),
-                    new Animation(Animation.Type.SMOOTH, 0),
-                    null);
+            mapview.getMap().setRotateGesturesEnabled(false);
+            mapview.getMap().move(new CameraPosition(new Point(0, 0), 14, 0, 0));
+        MapKit mapKit = MapKitFactory.getInstance();
+        userLocationLayer = mapKit.createUserLocationLayer(mapview.getMapWindow());
+        userLocationLayer.setVisible(true);
+        userLocationLayer.setHeadingEnabled(true);
+
+        userLocationLayer.setObjectListener(this);
         return root;
     }
+
 
     @Override
     public void onStart() {
@@ -51,5 +71,47 @@ public class MapFragment extends Fragment {
         super.onStop();
         mapview.onStop();
         MapKitFactory.getInstance().onStop();
+    }
+
+    @Override
+    public void onObjectAdded(@NonNull UserLocationView userLocationView) {
+        userLocationLayer.setAnchor(
+                new PointF((float)(mapview.getWidth() * 0.5), (float)(mapview.getHeight() * 0.5)),
+                new PointF((float)(mapview.getWidth() * 0.5), (float)(mapview.getHeight() * 0.83)));
+
+        userLocationView.getArrow().setIcon(ImageProvider.fromResource(
+                getActivity(), R.drawable.arrow));
+
+        CompositeIcon pinIcon = userLocationView.getPin().useCompositeIcon();
+
+        pinIcon.setIcon(
+                "icon",
+                ImageProvider.fromResource(getActivity(), R.drawable.ic_home_black_24dp),
+                new IconStyle().setAnchor(new PointF(0f, 0f))
+                        .setRotationType(RotationType.ROTATE)
+                        .setZIndex(0f)
+                        .setScale(1f)
+        );
+
+        pinIcon.setIcon(
+                "pin",
+                ImageProvider.fromResource(getActivity(), R.drawable.ic_dashboard_black_24dp),
+                new IconStyle().setAnchor(new PointF(0.5f, 0.5f))
+                        .setRotationType(RotationType.ROTATE)
+                        .setZIndex(1f)
+                        .setScale(0.5f)
+        );
+
+        userLocationView.getAccuracyCircle().setFillColor(Color.BLUE);
+    }
+
+    @Override
+    public void onObjectRemoved(@NonNull UserLocationView userLocationView) {
+
+    }
+
+    @Override
+    public void onObjectUpdated(@NonNull UserLocationView userLocationView, @NonNull ObjectEvent objectEvent) {
+
     }
 }

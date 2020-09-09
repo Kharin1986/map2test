@@ -32,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
           MapKitFactory.setApiKey(APIKEY);
             MapKitFactory.initialize(this);
 
+            //permissions
+
+
     }
 
 }
