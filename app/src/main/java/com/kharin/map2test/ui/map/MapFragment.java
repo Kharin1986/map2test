@@ -8,18 +8,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-
 import com.kharin.map2test.R;
-import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.MapKit;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.geometry.Point;
@@ -41,22 +35,25 @@ public class MapFragment extends Fragment implements UserLocationObjectListener 
     private MapView mapview;
 
 
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mapViewModel =
                 ViewModelProviders.of(this).get(MapViewModel.class);
         View root = inflater.inflate(R.layout.fragment_map, container, false);
-            mapview = (MapView) root.findViewById(R.id.mapview);
+
+
+            mapview =  root.findViewById(R.id.mapview);
             mapview.getMap().setRotateGesturesEnabled(false);
             mapview.getMap().move(new CameraPosition(new Point(0, 0), 14, 0, 0));
-        MapKit mapKit = MapKitFactory.getInstance();
-        userLocationLayer = mapKit.createUserLocationLayer(mapview.getMapWindow());
-        userLocationLayer.setVisible(true);
-        userLocationLayer.setHeadingEnabled(true);
-
-        userLocationLayer.setObjectListener(this);
+            MapKit mapKit = MapKitFactory.getInstance();
+            userLocationLayer = mapKit.createUserLocationLayer(mapview.getMapWindow());
+            userLocationLayer.setVisible(true);
+            userLocationLayer.setHeadingEnabled(true);
+            userLocationLayer.setObjectListener(this);
         return root;
     }
+
 
 
     @Override
@@ -78,31 +75,32 @@ public class MapFragment extends Fragment implements UserLocationObjectListener 
         userLocationLayer.setAnchor(
                 new PointF((float)(mapview.getWidth() * 0.5), (float)(mapview.getHeight() * 0.5)),
                 new PointF((float)(mapview.getWidth() * 0.5), (float)(mapview.getHeight() * 0.83)));
+        if(getActivity()!=null) {
+            userLocationView.getArrow().setIcon(ImageProvider.fromResource(
+                    getActivity(), R.drawable.user_arrow));
 
-        userLocationView.getArrow().setIcon(ImageProvider.fromResource(
-                getActivity(), R.drawable.arrow));
+            CompositeIcon pinIcon = userLocationView.getPin().useCompositeIcon();
 
-        CompositeIcon pinIcon = userLocationView.getPin().useCompositeIcon();
+//            pinIcon.setIcon(
+//                    "icon",
+//                    ImageProvider.fromResource(getActivity(), R.drawable.icon),
+//                    new IconStyle().setAnchor(new PointF(0f, 0f))
+//                            .setRotationType(RotationType.ROTATE)
+//                            .setZIndex(0f)
+//                            .setScale(1f)
+//            );
 
-        pinIcon.setIcon(
-                "icon",
-                ImageProvider.fromResource(getActivity(), R.drawable.ic_home_black_24dp),
-                new IconStyle().setAnchor(new PointF(0f, 0f))
-                        .setRotationType(RotationType.ROTATE)
-                        .setZIndex(0f)
-                        .setScale(1f)
-        );
+            pinIcon.setIcon(
+                    "pin",
+                    ImageProvider.fromResource(getActivity(), R.drawable.search_result),
+                    new IconStyle().setAnchor(new PointF(0.5f, 0.5f))
+                            .setRotationType(RotationType.ROTATE)
+                            .setZIndex(1f)
+                            .setScale(0.5f)
+            );
 
-        pinIcon.setIcon(
-                "pin",
-                ImageProvider.fromResource(getActivity(), R.drawable.ic_dashboard_black_24dp),
-                new IconStyle().setAnchor(new PointF(0.5f, 0.5f))
-                        .setRotationType(RotationType.ROTATE)
-                        .setZIndex(1f)
-                        .setScale(0.5f)
-        );
-
-        userLocationView.getAccuracyCircle().setFillColor(Color.BLUE);
+       //   userLocationView.getAccuracyCircle().setFillColor(Color.BLUE);
+        }
     }
 
     @Override
