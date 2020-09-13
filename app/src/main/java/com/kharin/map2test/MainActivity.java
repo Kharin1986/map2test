@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.mapview.MapView;
+import com.yandex.mapkit.transport.TransportFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -20,14 +21,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_FINE_PERMISSION = 20;
     private final String APIKEY = "8b473f18-1ae9-4111-bcf6-b0e48927546b";
     private MapView mapview;
-    private static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 11;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_map, R.id.navigation_notifications)
                 .build();
@@ -37,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navView, navController);
             MapKitFactory.setApiKey(APIKEY);
             MapKitFactory.initialize(this);
+            TransportFactory.initialize(this);// для общественного транспорта
+
         }
     }
     private boolean receivePermissions() {
